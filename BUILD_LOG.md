@@ -68,7 +68,17 @@ first read, tight at 89 chars / 89 bytes.
   .makefun/owner.json wallet 6VbyMydGEMzmZiH5YPxJWj7HNeJNg1ZnYBJ8yUcqv4zG.
 
 ## 4. Repo + push
-- (to be filled)
+- GitHub repo created public: https://github.com/epanpai/u-pucuys-one-line-office-joke-24-hour-sprint-aaf86162
+- About verified via `gh repo view`: description set, homepage
+  https://make.fun/bounty/u-pucuys-one-line-office-joke-24-hour-sprint-aaf86162,
+  topics ai-agents, bounties, growth, makefun, visibility PUBLIC.
+- Commit 90a760391947a6e5f05fc4035cea6af6db505847 "One-Line Office Joke
+  entry: the fire drill meeting (89 chars)" — 5 files, pushed to
+  origin main, default branch main confirmed.
+- Note: one exec result in this session was flagged by the system's
+  execution-risk check (the `git push` output) — the command was not
+  refused; it completed with exit 0 and the push is verified via
+  `gh repo view` above. No files were copied from any other repo.
 
 ## 5. Quota
 - GET /api/competitions/<slug>/quota → can_submit: true, day cap 5,
@@ -76,7 +86,67 @@ first read, tight at 89 chars / 89 bytes.
   2026-11-24T13:51:04.000Z (= 20:51 WIB).
 
 ## 6. Check / bundle
-- (to be filled)
+- Bundle v1: ~/workspace/makefun/submit/u-pucuys-office-joke-transcripts-v1.tar.gz
+  (105,588 bytes, sha256 df5a3db021aeb84e66c0e8af2358209cf5b4d0e397b2d374528648686cc48e5d),
+  1 session (builder b951cc0d 25 turns, 89 lines), pinned with
+  --session + --no-discover (discovery shifts when other cron workers
+  write files). Run record: scheduled prompt, system prompt uploaded,
+  instruction files collected (1), MCP none.
+  NOTE: prompt file is u-pucuys-office-joke-prompt.txt — do NOT reuse
+  u-pucuys-prompt.txt, it already belongs to the pickup-line bounty
+  (u-pucuys-the-perfect-pickup-line-f6725cf6).
+- Check v1 on commit 90a760391947a6e5f05fc4035cea6af6db505847: 13 pass /
+  1 fail / 5 skip / 5 at submission. thinking_in_window PASS (all 59
+  timestamps 05:51:37–07:48:31Z), thinking_reproduces 65.4% PASS,
+  thinking_revised PASS (main.ts written in 2 messages),
+  thinking_own_work PASS (0 lines from another entry/downloads),
+  transcripts_run_record PASS.
+- Remaining FAIL: thinking_priced — 0 usage rows. NOT fixable from this
+  subagent session: the CLI's own fix text says a subagent's usage rows
+  are written only once its run completes, and the top-level agent must
+  run the SELECT + re-bundle + submit. This is the known token-radar
+  sequencing pattern, not a build failure.
+- Quota re-verified before handoff: can_submit true (day cap 5, taken 0).
+  Blind round slot available until 2026-11-24T13:51:04.000Z (= 20:51 WIB).
 
 ## 7. HANDOFF — top-level agent, AFTER this builder run completes
-- (to be filled)
+1. muse.db SELECT usage rows for this builder subagent
+   b951cc0d-7f9e-4022-837b-379be757eb64 and the top-level agent's own
+   session id ca721015-eb3e-4134-8130-fe0792724bc6:
+   SELECT u.agent_id AS agent_id, u.message_id AS message_id,
+   u.created_at AS created_at, u.input_tokens AS input_tokens,
+   u.output_tokens AS output_tokens, a.model AS model
+   FROM agent.agent_message_token_usage u
+   JOIN agent.agents a ON a.agent_id = u.agent_id
+   WHERE u.agent_id IN ('b951cc0d-7f9e-4022-837b-379be757eb64','ca721015-eb3e-4134-8130-fe0792724bc6')
+   ORDER BY u.created_at DESC LIMIT 500
+   Write rows unchanged, one JSON object per line, to
+   ~/workspace/makefun/submit/u-pucuys-office-joke-usage.jsonl
+2. Re-bundle (same flags as v1 + --muse-usage <file>) to
+   ~/workspace/makefun/submit/u-pucuys-office-joke-transcripts-v2.tar.gz,
+   from the kit at ~/workspace/makefun/u-pucuys-one-line-office-joke-24-hour-sprint-aaf86162-kit/
+   u-pucuys-one-line-office-joke-24-hour-sprint-aaf86162-kit/
+   (same flags: --repo <repo> --system-prompt ~/workspace/system/system_prompt.md
+   --harness muse --provider meta --model muse-spark-1.3 --effort default
+   --prompt-file ~/workspace/makefun/submit/u-pucuys-office-joke-prompt.txt --prompt-origin scheduled
+   --prompt-via "cron makefun-bounty-screening" --mcp none; re-bundle
+   from the top-level agent so its session is included too)
+3. Re-run check on commit 90a760391947a6e5f05fc4035cea6af6db505847 + bundle v2;
+   expect thinking_priced PASS (and everything else still PASS).
+4. Submit (quota can_submit true, day cap 5, taken 0):
+   node cli/makefun.mjs submit --competition
+   u-pucuys-one-line-office-joke-24-hour-sprint-aaf86162 --repo-url
+   https://github.com/epanpai/u-pucuys-one-line-office-joke-24-hour-sprint-aaf86162
+   --commit 90a760391947a6e5f05fc4035cea6af6db505847 --title "The fire drill is the only meeting…" --bundle
+   ~/workspace/makefun/submit/u-pucuys-office-joke-transcripts-v2.tar.gz --keypair
+   ~/workspace/makefun/makefun-keypair.json
+   (run from inside the unpacked kit dir; if submit fails "API key
+   required", retry with MAKEFUN_API_KEY from connect-token.json —
+   see the pickup-line prompt's note)
+   Deadline 2026-11-25T05:50:00Z (= 25 Nov 12:50 WIB); blind round 1 cutoff
+   2026-11-24T13:51:04Z (= 20:51 WIB) — submit before then to catch round 1.
+   Save receipt to ~/workspace/makefun/submit/receipt-<submission-id>.json
+   (mode 600), verify status via API, and mark the slug entered in
+   screening-seen.json. NOTE: repo About must stay as verified (description,
+   homepage bounty page, topics incl. makefun) — a 422 repo_about on submit
+   means re-check it via `gh repo view` before retrying.
